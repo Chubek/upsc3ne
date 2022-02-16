@@ -1,32 +1,13 @@
+#[path = "./utils.rs"] mod utils;
+
 use std::cmp::{max, min};
 use regex::Regex;
 use lazy_static::lazy_static;
 use std::collections::HashSet;
-
-fn return_larger_smaller<'a>(a: &'a String, b: &'a String) -> (&'a String, &'a String) {
-    let len_a = a.len() as i32;
-    let len_b = b.len() as i32;
-
-    let diff = len_a - len_b;
-
-    let larger: &String;
-    let smaller: &String;
-
-    if diff >= 0 {
-        larger = a;
-        smaller = b;
-    } else {
-        larger = b;
-        smaller = a;
-    }
-
-    return (larger, smaller)
-
-
-}
+use math::round::ceil;
 
 pub fn levenshtein(a_str: &String, b_str: &String) -> u32 {
-    let larger_smaller = return_larger_smaller(a_str, b_str);
+    let larger_smaller = utils::return_larger_smaller(a_str, b_str);
 
     let a = larger_smaller.1.as_bytes();
     let b = larger_smaller.0.as_bytes();
@@ -58,10 +39,10 @@ pub fn levenshtein(a_str: &String, b_str: &String) -> u32 {
 
     }
 
-    return d[m - 1usize][n - 1usize] + 1
+    return d[m - 1usize][n - 1usize]
 }
 
-pub fn lev_ratio(a: &String, b: &String) -> u32 {
+pub fn lev_ratio(a: &String, b: &String) -> u8 {
     let d = levenshtein(a, b);
 
     let m = a.len() as u32;
@@ -69,15 +50,21 @@ pub fn lev_ratio(a: &String, b: &String) -> u32 {
 
     let max = max(m, n);
 
-    let ratio = (d as f32) / (max as f32) * 100f32;
+    let d_f64 = d as f64;
+    let max_f64 = max as f64;
 
-    println!("{}", ratio);
+    let ratio = (d_f64 / max_f64) * 100f64;
 
-    return ratio as u32
+
+    let ratio_ceil = ceil(ratio, 2);
+
+
+
+    return ratio_ceil as u8
 }
 
 
-pub fn token_set_ratio(a: &String, b: &String) -> u32 {
+pub fn token_set_ratio(a: &String, b: &String) -> u8 {
     lazy_static! {
         static ref RE: Regex = Regex::new(r"[.,/#!?$%\^&\*;:{}=\-_`~()\[\]]").unwrap();
         static ref RESPACE: Regex = Regex::new(r"\s+").unwrap();
@@ -106,16 +93,30 @@ pub fn token_set_ratio(a: &String, b: &String) -> u32 {
         .collect::<Vec<_>>();
     sect_str.sort();
 
-    let mut sect_diff_ab = a_diff_b
+    let sect_diff_ab = a_diff_b
         .into_iter()
         .collect::<Vec<_>>();
     sect_str.sort();
 
-    let mut sect_diff_ba = b_diff_a
+    let sect_diff_ba = b_diff_a
         .into_iter()
         .collect::<Vec<_>>();
     sect_str.sort();
 
-    println!("{:#?}\n{:#?}\n{:#?}", sect_str, sect_diff_ab, sect_diff_ba);
-    return 0
+    let sect_joined = utils::join_str(sect_str);
+    let diff_ab_join = utils::join_str(sect_diff_ab);
+    let diff_ba_join = utils::join_str(sect_diff_ba);
+
+    let sect_ab = utils::join_space(&sect_joined, &diff_ab_join);
+    let sect_ba= utils::join_space(&sect_joined, &diff_ba_join);
+
+    let ratio_sect_ab = lev_ratio(&sect_joined, &sect_ab);
+    let ratio_sect_ba = lev_ratio(&sect_joined, &sect_ba);
+    let ratio_ab_ab = lev_ratio(&sect_ab, &sect_ba);
+
+    let max_ratio = max(ratio_ab_ab, max(ratio_sect_ba, ratio_sect_ab));
+
+    println!("{} {} {}", ratio_sect_ab, ratio_sect_ba, ratio_ab_ab);
+
+    return max_ratio
 }
