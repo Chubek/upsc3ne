@@ -3,6 +3,7 @@ use crate::dtype::Profanity;
 
 mod levenshtein;
 mod dtype;
+mod lemma;
 
 #[test]
 fn test_levenshtein() {
@@ -52,6 +53,14 @@ fn test_records() {
     let mut message: &str = "";
     let records = dtype::read_records().expect(&message);
     println!("{:#?}", records[0])
+}
+
+#[test]
+fn test_lemma() {
+    println!("{}\n{}\n{}\n{}", lemma::apply_rule("povendicies"),
+             lemma::apply_rule("sproked"),
+             lemma::apply_rule("rapidacles"),
+             lemma::apply_rule("lamentations"))
 }
 
 

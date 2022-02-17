@@ -3,13 +3,21 @@ use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
+use std::borrow::BorrowMut;
+
+#[derive(Debug)]
+#[derive(Serialize, Deserialize)]
+pub struct ProfanityResult{
+    pub profanities: Vec<ProfanityRecord>,
+    pub final_score: f64
+}
 
 #[derive(Debug)]
 #[derive(Serialize, Deserialize)]
 pub struct ProfanityRecord{
-    profanity: String,
-    category: String,
-    score: f64
+    pub profanity: String,
+    pub category: String,
+    pub score: f64
 }
 
 pub fn read_records() -> Result<Vec<ProfanityRecord>, Box<dyn Error>> {
@@ -89,9 +97,6 @@ fn qs_vec((start_pass, end_pass): ( usize, usize), vector: &mut Vec<Profanity>, 
         qs_vec((p_plus_one, end), vector.borrow_mut(), neg_flag);
 
     }
-
-
-
 
 
 }
