@@ -1,9 +1,12 @@
 #[path = "./utils.rs"] mod utils;
+#[path = "./dtype.rs"] mod dtype;
 
+use std::borrow::BorrowMut;
 use std::cmp::{max, min};
 use regex::Regex;
 use lazy_static::lazy_static;
 use std::collections::HashSet;
+
 use math::round::ceil;
 
 pub fn levenshtein(a_str: &String, b_str: &String) -> u32 {
@@ -14,6 +17,18 @@ pub fn levenshtein(a_str: &String, b_str: &String) -> u32 {
 
     let m = a.len();
     let n = b.len();
+
+    if m == 0 {
+        return n as u32
+    }
+
+    if n == 0 {
+        return m as u32
+    }
+
+    if m == 0 && n == 0 {
+        return 0u32
+    }
 
     let mut d = vec![vec![0u32; n]; m];
 
@@ -65,6 +80,7 @@ pub fn lev_ratio(a: &String, b: &String) -> u8 {
 
 
 pub fn token_set_ratio(a: &String, b: &String) -> u8 {
+
     lazy_static! {
         static ref RE: Regex = Regex::new(r"[.,/#!?$%\^&\*;:{}=\-_`~()\[\]]").unwrap();
         static ref RESPACE: Regex = Regex::new(r"\s+").unwrap();
@@ -116,7 +132,21 @@ pub fn token_set_ratio(a: &String, b: &String) -> u8 {
 
     let max_ratio = max(ratio_ab_ab, max(ratio_sect_ba, ratio_sect_ab));
 
-    println!("{} {} {}", ratio_sect_ab, ratio_sect_ba, ratio_ab_ab);
-
     return max_ratio
+}
+
+pub fn process_token_set_ratio<'a>(comp: &str, choices: Vec<&'static str>) -> Vec<dtype::Profanity> {
+    let mut ret: Vec<dtype::Profanity>  = Vec::new();
+
+    for i in 0..choices.len() {
+        let word = choices[i].clone();
+        let distance = token_set_ratio(&comp.to_string(), &word.clone().to_string());
+        ret.push(dtype::Profanity{content: word, distance });
+    }
+
+
+    dtype::sort_profanity_vector(ret.borrow_mut());
+
+
+    return ret
 }

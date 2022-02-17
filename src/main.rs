@@ -1,4 +1,8 @@
+use std::borrow::BorrowMut;
+use crate::dtype::Profanity;
+
 mod levenshtein;
+mod dtype;
 
 #[test]
 fn test_levenshtein() {
@@ -21,6 +25,28 @@ fn test_ratio() {
 
     println!("{:#?}", res)
 }
+
+
+#[test]
+fn test_process() {
+    let choices = vec!["Fucked", "Sucked", "Duck"];
+
+    let res = levenshtein::process_token_set_ratio("I fucked that sucker", choices);
+
+    println!("{:#?}", res)
+}
+
+#[test]
+fn test_sort() {
+    let mut choices = vec![Profanity {content: "aaa", distance: 10},
+                       Profanity {content: "aaa", distance: 20}, Profanity {content: "aaa", distance: 5}];
+
+    dtype::sort_profanity_vector(choices.borrow_mut());
+
+    println!("{:#?}", choices)
+}
+
+
 
 
 fn main() {
