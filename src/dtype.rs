@@ -1,4 +1,25 @@
-use std::borrow::BorrowMut;
+use serde::{Deserialize, Serialize};
+use std::error::Error;
+use std::fs::File;
+use std::io::BufReader;
+use std::path::Path;
+
+#[derive(Debug)]
+#[derive(Serialize, Deserialize)]
+pub struct ProfanityRecord{
+    profanity: String,
+    category: String,
+    score: f64
+}
+
+pub fn read_records() -> Result<Vec<ProfanityRecord>, Box<dyn Error>> {
+    let file = File::open(Path::new("src/records.json"))?;
+    let reader = BufReader::new(file);
+
+    let records: Vec<ProfanityRecord> = serde_json::from_reader(reader)?;
+
+    Ok(records)
+}
 
 #[derive(Debug)]
 #[derive(Clone)]

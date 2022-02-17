@@ -47,6 +47,13 @@ fn test_sort() {
 }
 
 
+#[test]
+fn test_records() {
+    let mut message: &str = "";
+    let records = dtype::read_records().expect(&message);
+    println!("{:#?}", records[0])
+}
+
 
 
 fn main() {
