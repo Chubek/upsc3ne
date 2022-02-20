@@ -1,3 +1,7 @@
+use std::borrow::Borrow;
+use std::ops::Deref;
+use crate::dtype::ProfanityRecord;
+
 pub fn join_str(vec: Vec<&&str>) -> String {
     let mut ret = String::from("");
 
@@ -38,4 +42,9 @@ pub fn return_larger_smaller<'a>(a: &'a String, b: &'a String) -> (&'a String, &
     return (larger, smaller)
 
 
+}
+
+
+pub fn give_ownership(rec: &ProfanityRecord) -> ProfanityRecord {
+    return *rec.clone_into()
 }

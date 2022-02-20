@@ -4,6 +4,8 @@ use crate::dtype::Profanity;
 mod levenshtein;
 mod dtype;
 mod lemma;
+mod detector;
+mod utils;
 
 #[test]
 fn test_levenshtein() {
@@ -63,7 +65,10 @@ fn test_lemma() {
              lemma::apply_rule("lamentations"))
 }
 
-
+#[test]
+fn test_split() {
+   println!("{:#?}", "I have        a giant d ude   in my   hand".split_whitespace().collect::<Vec<_>>())
+}
 
 fn main() {
     levenshtein::levenshtein(&String::from("saa"), &String::from("safffa"));

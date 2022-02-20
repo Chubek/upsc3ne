@@ -1,5 +1,5 @@
-#[path = "./utils.rs"] mod utils;
-#[path = "./dtype.rs"] mod dtype;
+use  crate::utils;
+use crate::dtype;
 
 use std::borrow::BorrowMut;
 use std::cmp::{max, min};
@@ -8,6 +8,7 @@ use lazy_static::lazy_static;
 use std::collections::HashSet;
 
 use math::round::ceil;
+use crate::dtype::ProfanityRecord;
 
 pub fn levenshtein(a_str: &String, b_str: &String) -> u32 {
     let larger_smaller = utils::return_larger_smaller(a_str, b_str);
@@ -135,12 +136,12 @@ pub fn token_set_ratio(a: &String, b: &String) -> u8 {
     return max_ratio
 }
 
-pub fn process_token_set_ratio<'a>(comp: &str, choices: Vec<&'static str>) -> Vec<dtype::Profanity> {
+pub fn process_token_set_ratio(comp: &String, choices: &Vec<ProfanityRecord>) -> Vec<dtype::Profanity> {
     let mut ret: Vec<dtype::Profanity>  = Vec::new();
 
     for i in 0..choices.len() {
-        let word = choices[i].clone();
-        let distance = token_set_ratio(&comp.to_string(), &word.clone().to_string());
+        let word = choices[i].profanity.clone();
+        let distance = token_set_ratio(&comp, &word);
         ret.push(dtype::Profanity{content: word, distance });
     }
 
